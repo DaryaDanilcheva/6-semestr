@@ -1,0 +1,128 @@
+#encoding utf-8
+<html>
+<head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+<title>Телефоный справочник</title>
+<link rel=stylesheet type=text/css href='/style.css'>
+</head>
+<body>
+<form action="/export" method="get">
+  <input type="hidden" name= 'subdivision' value=$subdivision>
+  <input type="hidden" name= 'collaborator' value=$collaborator>
+  <input type="hidden" name= 'number' value=$number>
+  <input type="hidden" name= 'telephoneType' value=$telephoneType>
+  <input type="submit" value = 'Сохранить'>
+</form>
+<hr size=1 color=#000066>
+<p>Телефонных номеров: <b>${len($telephoneDir)}</b></p>
+<form action='/database' method=get>
+  <table cellspacing=8 cellpadding=0>
+    <tr>
+      <td align=center>
+        По подразделению
+      </td>
+      <td align=center>
+        По сотруднику
+      </td>
+      <td align=center>
+        По номеру
+      </td>
+      <td align=center>
+        По типу
+      </td>
+      <td align=center rowspan=2 valign=bottom>
+        <input type=submit value="Задать фильтр">
+      </td>
+    </tr>
+    <tr>
+      <td align=center>
+        <select name=subdivision class=inp>
+        #if $subdivision == '0'
+          <option value='0' selected>все</option>
+        #else
+          <option value='0'>все</option>
+        #end if
+        #for $i in range(1, len($subdivisions))
+          #if $i == $subdivision
+          <option value='$i' selected>$(subdivisions[$i].name)</option>
+          #else
+          <option value='$i'>$(subdivisions[$i].name)</option>
+          #end if
+        #end for
+        </select>
+      </td>
+      <td align=center>
+        <input class=inp type=text name=collaborator value='${collaborator}' size=12 maxlength=13>
+      </td>
+      <td align=center>
+        <input class=inp type=text name=number value='${number}' size=12 maxlength=13>
+      </td>
+      <td align=center>
+        <select name=telephoneType class=inp>
+        #if $telephoneType == '0'
+          <option value='0' selected>все</option>
+        #else
+          <option value='0'>все</option>
+        #end if
+        #for $i in range(1, len($telephoneTypes))
+          #if $i == $telephoneType
+          <option value='$i' selected>$(telephoneTypes[$i].name)</option>
+          #else
+          <option value='$i'>$(telephoneTypes[$i].name)</option>
+          #end if
+        #end for
+        </select>
+    </tr>
+  </table>
+</form>
+
+#set $pageSize = 20
+<table border=0 cellspacing=1 cellpadding=2>
+  <tr class=rowhead align=center>
+    <td align=center rowspan=2><b>#</b></td>
+    <td align=center rowspan=2><b>ФИО</b></td>
+    <td align=center colspan=2><b>Телефон</b></td>
+    <td align=center rowspan=2><b>123</b></td>
+    <td align=center rowspan=2><b>qwe</b></td>
+  </tr>
+  <tr class=rowhead align=center>
+    <td align=center><b>Номер</b></td>
+    <td align=center><b>Тип</b></td>
+  </tr>
+  #set $r=2
+  #for i in range($page*$pageSize, min(($page+1)*$pageSize, len($telephoneDir)))
+  <tr class=row${r}>
+    <td align=right>${i+1}</td>
+    <td align=left>${namesList[i]}</td>
+    <td align=left>${phonesList[i]}</td>
+    <td align=center>${typeList[i]}</td>
+    <td align=center>${proffession[i]}</td>
+    <td align=center>${workList[i]}</td>
+  </tr>
+    #if $r == 1
+      #set $r = 2
+    #else
+      #set $r = 1
+    #end if
+  #end for
+</table>
+
+#if $page == 0
+  #set $prevPage = "Предыдушая страница"
+#else
+  #set $prevPage ="<A href='/database?page=%d&subdivision=%d&collaborator=%s&number=%s&telephoneType=%d'>Предыдушая страница</A>" % \
+             ($page - 1, $subdivision, $collaborator, $number, $telephoneType)
+#end if
+#if ($page + 1)*$pageSize >= len($telephoneDir)
+  #set $nextPage = "Следующая страница"
+#else
+  #set $nextPage ="<A href='/database?page=%d&subdivision=%d&collaborator=%s&number=%s&telephoneType=%d'>Следующая страница</A>" % \
+             ($page + 1, $subdivision, $collaborator, $number, $telephoneType)
+#end if
+<br>${prevPage}&nbsp;|&nbsp;${nextPage}
+<p><hr size=1 color=#000066><a href="/">вернутся на главную страницу</a>
+</br>
+<form class="close_session" action="/close_session" method="post">
+  <input type="submit" value="Выйти">
+<form>
+</body>
+</html>
